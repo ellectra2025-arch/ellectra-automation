@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel — Ellectra Automation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black: #0a0a0a; --yellow: #FFD600; --yellow-dim: #e6c000;
+      --white: #ffffff; --light: #f0f0eb; --gray: #888;
+      --border: #e0e0e0; --green: #4caf50; --red: #f44336;
+      --panel: #111; --panel2: #1a1a1a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+
+    /* LOGIN SCREEN */
+    #loginScreen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: var(--black);
+      background-image: radial-gradient(circle at 20% 50%, rgba(255,214,0,0.04) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255,214,0,0.03) 0%, transparent 50%);
+    }
+    .login-card {
+      background: #111; border: 2px solid #222; border-radius: 8px;
+      padding: 60px 48px; width: 100%; max-width: 440px; text-align: center;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+    }
+    .login-logo img { height: 50px; margin-bottom: 32px; }
+    .login-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; color: var(--white); margin-bottom: 8px; }
+    .login-sub { font-size: 13px; color: var(--gray); margin-bottom: 40px; }
+    .login-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
+    .login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: #2a2a2a; }
+    .login-divider span { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 1px; }
+    .input-group { margin-bottom: 16px; text-align: left; }
+    .input-group label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); margin-bottom: 8px; }
+    .input-group input {
+      width: 100%; padding: 14px 16px; background: #1a1a1a; border: 1.5px solid #2a2a2a;
+      border-radius: 2px; color: var(--white); font-family: 'Montserrat', sans-serif;
+      font-size: 14px; outline: none; transition: border-color 0.2s;
+    }
+    .input-group input:focus { border-color: var(--yellow); }
+    .btn-login {
+      width: 100%; padding: 16px; background: var(--yellow); border: none; border-radius: 2px;
+      font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 14px; letter-spacing: 2px;
+      text-transform: uppercase; cursor: pointer; transition: all 0.2s; color: var(--black);
+    }
+    .btn-login:hover { background: var(--yellow-dim); }
+    .btn-google {
+      width: 100%; padding: 14px; background: #fff; border: none; border-radius: 2px;
+      font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1px;
+      text-transform: uppercase; cursor: pointer; transition: all 0.2s; color: #333;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-google:hover { background: #f5f5f5; }
+    .login-error { color: var(--red); font-size: 12px; margin-top: 12px; display: none; }
+
+    /* ADMIN LAYOUT */
+    #adminPanel { display: none; min-height: 100vh; }
+    .admin-header {
+      background: var(--panel); border-bottom: 2px solid var(--yellow);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 64px; position: sticky; top: 0; z-index: 100;
+    }
+    .admin-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; }
+    .admin-logo span { color: var(--yellow); }
+    .admin-user { display: flex; align-items: center; gap: 16px; }
+    .user-email { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--gray); }
+    .btn-signout {
+      background: transparent; border: 1px solid #333; color: var(--gray);
+      padding: 8px 16px; border-radius: 2px; font-size: 12px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-signout:hover { border-color: var(--red); color: var(--red); }
+
+    .admin-body { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 64px); }
+
+    /* SIDEBAR */
+    .admin-sidebar { background: var(--panel); border-right: 1px solid #1a1a1a; padding: 24px 0; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li a {
+      display: flex; align-items: center; gap: 12px; padding: 14px 24px;
+      color: var(--gray); text-decoration: none; font-size: 13px; font-weight: 600;
+      letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; border-left: 3px solid transparent;
+    }
+    .sidebar-nav li a:hover { color: var(--white); background: rgba(255,255,255,0.03); }
+    .sidebar-nav li a.active { color: var(--yellow); border-left-color: var(--yellow); background: rgba(255,214,0,0.05); }
+    .sidebar-icon { font-size: 16px; }
+    .sidebar-stats { padding: 20px 24px; border-top: 1px solid #1a1a1a; margin-top: 16px; }
+    .sidebar-stat { margin-bottom: 16px; }
+    .ss-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #555; margin-bottom: 4px; }
+    .ss-val { font-family: 'Space Mono', monospace; font-size: 20px; color: var(--yellow); }
+
+    /* CONTENT */
+    .admin-content { padding: 32px; overflow-y: auto; }
+
+    /* STATS CARDS */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: var(--panel2); border-radius: 4px; border: 1px solid #222; padding: 24px; }
+    .stat-card-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--gray); margin-bottom: 10px; }
+    .stat-card-num { font-family: 'Bebas Neue', sans-serif; font-size: 40px; line-height: 1; margin-bottom: 6px; }
+    .stat-card-num.yellow { color: var(--yellow); }
+    .stat-card-num.green { color: var(--green); }
+    .stat-card-num.red { color: var(--red); }
+    .stat-card-num.blue { color: #4fc3f7; }
+    .stat-card-sub { font-size: 11px; color: #555; }
+
+    /* FILTERS */
+    .table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .table-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px; }
+    .filter-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 8px 18px; background: transparent; border: 1px solid #2a2a2a;
+      color: var(--gray); border-radius: 2px; font-size: 12px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+    }
+    .filter-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+    .filter-btn.active { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+    .search-input {
+      padding: 8px 16px; background: var(--panel2); border: 1px solid #2a2a2a;
+      border-radius: 2px; color: var(--white); font-family: 'Montserrat', sans-serif;
+      font-size: 13px; outline: none; width: 220px;
+    }
+    .search-input:focus { border-color: var(--yellow); }
+
+    /* ORDERS TABLE */
+    .orders-table-wrap { background: var(--panel2); border-radius: 4px; border: 1px solid #1a1a1a; overflow: hidden; }
+    .orders-table { width: 100%; border-collapse: collapse; }
+    .orders-table th { padding: 14px 18px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); border-bottom: 1px solid #1a1a1a; background: var(--panel); }
+    .orders-table td { padding: 14px 18px; font-size: 13px; border-bottom: 1px solid #111; color: rgba(255,255,255,0.8); vertical-align: top; }
+    .orders-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .orders-table tr:last-child td { border-bottom: none; }
+    .version-badge { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 2px; background: var(--yellow); color: var(--black); display: inline-block; }
+    .status-badge { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; display: inline-block; cursor: pointer; }
+    .status-pending { background: rgba(255,214,0,0.15); color: var(--yellow); }
+    .status-confirmed { background: rgba(76,175,80,0.15); color: var(--green); }
+    .status-installed { background: rgba(79,195,247,0.15); color: #4fc3f7; }
+    .status-cancelled { background: rgba(244,67,54,0.15); color: var(--red); }
+    .action-btn {
+      background: transparent; border: 1px solid #2a2a2a; color: var(--gray);
+      padding: 6px 12px; border-radius: 2px; font-size: 11px; cursor: pointer;
+      transition: all 0.2s; font-family: 'Montserrat', sans-serif; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px;
+    }
+    .action-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+    .action-btn.danger:hover { border-color: var(--red); color: var(--red); }
+    .install-type { font-size: 11px; color: #555; margin-top: 3px; }
+
+    /* LOADING */
+    .loading { text-align: center; padding: 60px; color: var(--gray); }
+    .spinner { width: 32px; height: 32px; border: 3px solid #222; border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ORDER DETAIL MODAL */
+    #modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      z-index: 9999; align-items: center; justify-content: center;
+    }
+    #modal.show { display: flex; }
+    .modal-card {
+      background: var(--panel2); border: 1px solid #2a2a2a; border-radius: 8px;
+      padding: 40px; max-width: 560px; width: 90%; max-height: 85vh; overflow-y: auto;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; }
+    .modal-close { background: transparent; border: 1px solid #333; color: var(--gray); width: 36px; height: 36px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .modal-close:hover { border-color: var(--red); color: var(--red); }
+    .detail-row { display: flex; border-bottom: 1px solid #1a1a1a; padding: 12px 0; }
+    .detail-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #555; width: 140px; flex-shrink: 0; }
+    .detail-val { font-size: 13px; color: rgba(255,255,255,0.8); flex: 1; }
+    .status-select {
+      background: var(--panel); border: 1px solid #2a2a2a; color: var(--white);
+      padding: 8px 14px; border-radius: 2px; font-family: 'Montserrat', sans-serif;
+      font-size: 13px; outline: none; width: 100%; margin-top: 20px;
+    }
+    .btn-update { margin-top: 12px; width: 100%; padding: 14px; background: var(--yellow); border: none; border-radius: 2px; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; color: var(--black); }
+
+    /* TOAST */
+    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--panel); color: var(--white); padding: 14px 28px; border-radius: 4px; border-left: 4px solid var(--yellow); font-weight: 700; font-size: 13px; opacity: 0; transition: opacity 0.3s; z-index: 9999; min-width: 260px; text-align: center; }
+    #toast.show { opacity: 1; }
+    #toast.err { border-color: var(--red); }
+
+    .empty-state { text-align: center; padding: 80px 20px; color: var(--gray); }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+
+    @media (max-width: 900px) {
+      .admin-body { grid-template-columns: 1fr; }
+      .admin-sidebar { display: none; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .admin-content { padding: 20px; }
+      .search-input { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/Ellectra_w01wap%20(2)%20(1).png" alt="Ellectra" onerror="this.style.display='none'"/>
+    </div>
+    <div class="login-title">ADMIN PANEL</div>
+    <div class="login-sub">Sign in to manage Ellectra orders</div>
+
+    <!-- Email/Password Login -->
+    <div class="input-group">
+      <label>Admin Email</label>
+      <input type="email" id="lEmail" placeholder="admin@ellectra.com"/>
+    </div>
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" id="lPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')emailLogin()"/>
+    </div>
+    <button class="btn-login" onclick="emailLogin()">SIGN IN</button>
+    <div id="loginError" class="login-error"></div>
+
+    <div class="login-divider"><span>or</span></div>
+
+    <!-- Google Sign-In -->
+    <button class="btn-google" onclick="googleLogin()">
+      <svg width="18" height="18" viewBox="0 0 48 48">
+        <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.3 29.3 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.3 1 7.2 2.7l5.7-5.7C33.5 7.3 29 5 24 5 13 5 4 14 4 25s9 20 20 20 20-9 20-20c0-1.3-.1-2.7-.4-4z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c2.8 0 5.3 1 7.2 2.7l5.7-5.7C33.5 7.3 29 5 24 5c-7.2 0-13.5 3.7-17.7 9.7z"/>
+        <path fill="#4CAF50" d="M24 45c5 0 9.5-1.9 12.9-5l-6-5.2C29.3 36.4 26.8 37 24 37c-5.3 0-9.7-2.7-11.3-6.8l-6.5 5C9.7 41.3 16.4 45 24 45z"/>
+        <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.4l6 5.2C38 36.9 44 31.5 44 25c0-1.3-.1-2.7-.4-4z"/>
+      </svg>
+      Continue with Google
+    </button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+  <div class="admin-header">
+    <div class="admin-logo">⚡ ELLEC<span>TRA</span> ADMIN</div>
+    <div class="admin-user">
+      <div class="user-email" id="userEmailDisplay"></div>
+      <button class="btn-signout" onclick="signOut()">Sign Out</button>
+    </div>
+  </div>
+  <div class="admin-body">
+    <!-- SIDEBAR -->
+    <div class="admin-sidebar">
+      <ul class="sidebar-nav">
+        <li><a href="#" class="active" onclick="showTab('orders', this)"><span class="sidebar-icon">📋</span> Orders</a></li>
+        <li><a href="#" onclick="showTab('stats', this)"><span class="sidebar-icon">📊</span> Statistics</a></li>
+      </ul>
+      <div class="sidebar-stats">
+        <div class="sidebar-stat">
+          <div class="ss-label">Total Orders</div>
+          <div class="ss-val" id="sbTotal">—</div>
+        </div>
+        <div class="sidebar-stat">
+          <div class="ss-label">Pending</div>
+          <div class="ss-val" id="sbPending">—</div>
+        </div>
+        <div class="sidebar-stat">
+          <div class="ss-label">Installed</div>
+          <div class="ss-val" id="sbInstalled">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="admin-content">
+      <!-- ORDERS TAB -->
+      <div id="tabOrders">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-card-label">Total Orders</div><div class="stat-card-num yellow" id="stTotal">0</div><div class="stat-card-sub">All time</div></div>
+          <div class="stat-card"><div class="stat-card-label">Pending</div><div class="stat-card-num" id="stPending">0</div><div class="stat-card-sub">Awaiting action</div></div>
+          <div class="stat-card"><div class="stat-card-label">Confirmed</div><div class="stat-card-num green" id="stConfirmed">0</div><div class="stat-card-sub">In progress</div></div>
+          <div class="stat-card"><div class="stat-card-label">Installed</div><div class="stat-card-num blue" id="stInstalled">0</div><div class="stat-card-sub">Completed</div></div>
+        </div>
+
+        <div class="table-header">
+          <div class="table-title">ALL ORDERS</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <input class="search-input" id="searchInput" placeholder="🔍  Search name, phone, email..." oninput="applyFilters()"/>
+            <div class="filter-row">
+              <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+              <button class="filter-btn" onclick="setFilter('pending', this)">Pending</button>
+              <button class="filter-btn" onclick="setFilter('confirmed', this)">Confirmed</button>
+              <button class="filter-btn" onclick="setFilter('installed', this)">Installed</button>
+              <button class="filter-btn" onclick="setFilter('cancelled', this)">Cancelled</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="orders-table-wrap">
+          <div id="tableLoading" class="loading"><div class="spinner"></div>Loading orders...</div>
+          <table class="orders-table" id="ordersTable" style="display:none;">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Version</th>
+                <th>Install Type</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+          <div id="emptyState" class="empty-state" style="display:none;">
+            <div class="empty-icon">📭</div>
+            <div>No orders found</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS TAB -->
+      <div id="tabStats" style="display:none;">
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:32px;margin-bottom:32px;">STATISTICS</h2>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-card-label">V1 Orders</div><div class="stat-card-num yellow" id="sv1">0</div></div>
+          <div class="stat-card"><div class="stat-card-label">V2 Orders</div><div class="stat-card-num yellow" id="sv2">0</div></div>
+          <div class="stat-card"><div class="stat-card-label">V3 Orders</div><div class="stat-card-num yellow" id="sv3">0</div></div>
+          <div class="stat-card"><div class="stat-card-label">Pro Installs Booked</div><div class="stat-card-num blue" id="sPro">0</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div id="modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">ORDER DETAILS</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modalBody"></div>
+    <select class="status-select" id="statusSelect">
+      <option value="pending">⏳ Pending</option>
+      <option value="confirmed">✅ Confirmed</option>
+      <option value="installed">🏠 Installed</option>
+      <option value="cancelled">❌ Cancelled</option>
+    </select>
+    <button class="btn-update" onclick="updateStatus()">UPDATE STATUS</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAWl0Oefp8qxFw5Sveekg4lePJUO1cUYl8",
+    authDomain: "ellectra-automation.firebaseapp.com",
+    projectId: "ellectra-automation",
+    storageBucket: "ellectra-automation.firebasestorage.app",
+    messagingSenderId: "1056646799251",
+    appId: "1:1056646799251:web:a12c8a5e8855d19a1b1266"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  window._db = db;
+  window._auth = auth;
+  window._provider = provider;
+  window._collection = collection;
+  window._getDocs = getDocs;
+  window._doc = doc;
+  window._updateDoc = updateDoc;
+  window._orderBy = orderBy;
+  window._query = query;
+  window._signInWithEmailAndPassword = signInWithEmailAndPassword;
+  window._signInWithPopup = signInWithPopup;
+  window._fbSignOut = fbSignOut;
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      document.getElementById('userEmailDisplay').textContent = user.email;
+      loadOrders();
+    } else {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('adminPanel').style.display = 'none';
+    }
+  });
+</script>
+
+<script>
+  let allOrders = [];
+  let currentFilter = 'all';
+  let currentOrderId = null;
+
+  function showToast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    setTimeout(() => { t.className = ''; }, 3000);
+  }
+
+  async function emailLogin() {
+    const email = document.getElementById('lEmail').value.trim();
+    const pass = document.getElementById('lPassword').value;
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    if (!email || !pass) { errEl.textContent = 'Please enter email and password.'; errEl.style.display = 'block'; return; }
+    try {
+      await window._signInWithEmailAndPassword(window._auth, email, pass);
+    } catch (e) {
+      errEl.textContent = 'Invalid credentials. Please try again.';
+      errEl.style.display = 'block';
+    }
+  }
+
+  async function googleLogin() {
+    try {
+      await window._signInWithPopup(window._auth, window._provider);
+    } catch (e) {
+      document.getElementById('loginError').textContent = 'Google sign-in failed. Try again.';
+      document.getElementById('loginError').style.display = 'block';
+    }
+  }
+
+  async function signOut() {
+    await window._fbSignOut(window._auth);
+  }
+
+  async function loadOrders() {
+    try {
+      const q = window._query(window._collection(window._db, 'orders'), window._orderBy('createdAt', 'desc'));
+      const snap = await window._getDocs(q);
+      allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch (e) {
+      // fallback without ordering if index not set
+      try {
+        const snap = await window._getDocs(window._collection(window._db, 'orders'));
+        allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse();
+      } catch (e2) {
+        showToast('Failed to load orders.', 'err');
+      }
+    }
+    updateStats();
+    applyFilters();
+    document.getElementById('tableLoading').style.display = 'none';
+    document.getElementById('ordersTable').style.display = 'table';
+  }
+
+  function updateStats() {
+    const total = allOrders.length;
+    const pending = allOrders.filter(o => o.status === 'pending').length;
+    const confirmed = allOrders.filter(o => o.status === 'confirmed').length;
+    const installed = allOrders.filter(o => o.status === 'installed').length;
+    const v1 = allOrders.filter(o => o.version === 'V1').length;
+    const v2 = allOrders.filter(o => o.version === 'V2').length;
+    const v3 = allOrders.filter(o => o.version === 'V3').length;
+    const pro = allOrders.filter(o => o.installationBooked).length;
+
+    document.getElementById('stTotal').textContent = total;
+    document.getElementById('stPending').textContent = pending;
+    document.getElementById('stConfirmed').textContent = confirmed;
+    document.getElementById('stInstalled').textContent = installed;
+    document.getElementById('sbTotal').textContent = total;
+    document.getElementById('sbPending').textContent = pending;
+    document.getElementById('sbInstalled').textContent = installed;
+    document.getElementById('sv1').textContent = v1;
+    document.getElementById('sv2').textContent = v2;
+    document.getElementById('sv3').textContent = v3;
+    document.getElementById('sPro').textContent = pro;
+  }
+
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = allOrders;
+    if (currentFilter !== 'all') filtered = filtered.filter(o => o.status === currentFilter);
+    if (search) filtered = filtered.filter(o =>
+      (o.name||'').toLowerCase().includes(search) ||
+      (o.email||'').toLowerCase().includes(search) ||
+      (o.phone||'').toLowerCase().includes(search) ||
+      (o.version||'').toLowerCase().includes(search)
+    );
+    renderOrders(filtered);
+  }
+
+  function renderOrders(orders) {
+    const tbody = document.getElementById('ordersBody');
+    const empty = document.getElementById('emptyState');
+    if (!orders.length) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    tbody.innerHTML = orders.map(o => {
+      const date = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}) : (o.createdAt ? new Date(o.createdAt).toLocaleDateString() : '—');
+      const statusClass = 'status-' + (o.status || 'pending');
+      const installLabel = o.installationBooked ? '👷 Professional' : '🔧 Self-Install';
+      return `<tr>
+        <td><span style="font-family:'Space Mono',monospace;font-size:11px;color:#555">${o.id.substring(0,8).toUpperCase()}</span></td>
+        <td>
+          <div style="font-weight:600">${o.name || '—'}</div>
+          <div style="font-size:11px;color:#555;margin-top:3px">${o.email || ''}</div>
+          <div style="font-size:11px;color:#555">${o.phone || ''}</div>
+        </td>
+        <td><span class="version-badge">${o.version || '—'}</span></td>
+        <td><span style="font-size:12px">${installLabel}</span>${o.address ? `<div style="font-size:11px;color:#555;margin-top:3px">${o.address.city||''}, ${o.address.state||''}</div>` : ''}</td>
+        <td style="font-size:12px;color:#555">${date}</td>
+        <td><span class="status-badge ${statusClass}">${(o.status||'pending').toUpperCase()}</span></td>
+        <td>
+          <button class="action-btn" onclick="openModal('${o.id}')">View</button>
+          <button class="action-btn danger" onclick="cancelOrder('${o.id}')">Cancel</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function openModal(id) {
+    const o = allOrders.find(x => x.id === id);
+    if (!o) return;
+    currentOrderId = id;
+    const date = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString('en-IN') : (o.createdAt ? new Date(o.createdAt).toLocaleString() : '—');
+    let html = `
+      <div class="detail-row"><div class="detail-label">Order ID</div><div class="detail-val" style="font-family:'Space Mono',monospace;font-size:11px">${id}</div></div>
+      <div class="detail-row"><div class="detail-label">Name</div><div class="detail-val">${o.name||'—'}</div></div>
+      <div class="detail-row"><div class="detail-label">Phone</div><div class="detail-val">${o.phone||'—'}</div></div>
+      <div class="detail-row"><div class="detail-label">Email</div><div class="detail-val">${o.email||'—'}</div></div>
+      <div class="detail-row"><div class="detail-label">Version</div><div class="detail-val">${o.version||'—'}</div></div>
+      <div class="detail-row"><div class="detail-label">Install Type</div><div class="detail-val">${o.installationBooked ? '👷 Professional Install' : '🔧 Self-Install'}</div></div>`;
+    if (o.address) {
+      html += `
+      <div class="detail-row"><div class="detail-label">Address</div><div class="detail-val">${o.address.street||''}, ${o.address.city||''}, ${o.address.state||''} — ${o.address.pincode||''}</div></div>
+      <div class="detail-row"><div class="detail-label">Pref. Date</div><div class="detail-val">${o.address.preferredDate||'Not specified'}</div></div>
+      <div class="detail-row"><div class="detail-label">Pref. Slot</div><div class="detail-val">${o.address.preferredTime||'Not specified'}</div></div>`;
+    }
+    if (o.notes) html += `<div class="detail-row"><div class="detail-label">Notes</div><div class="detail-val">${o.notes}</div></div>`;
+    html += `<div class="detail-row"><div class="detail-label">Ordered At</div><div class="detail-val">${date}</div></div>`;
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('statusSelect').value = o.status || 'pending';
+    document.getElementById('modal').classList.add('show');
+  }
+
+  function closeModal() { document.getElementById('modal').classList.remove('show'); currentOrderId = null; }
+
+  async function updateStatus() {
+    if (!currentOrderId) return;
+    const newStatus = document.getElementById('statusSelect').value;
+    try {
+      await window._updateDoc(window._doc(window._db, 'orders', currentOrderId), { status: newStatus });
+      const idx = allOrders.findIndex(o => o.id === currentOrderId);
+      if (idx !== -1) allOrders[idx].status = newStatus;
+      updateStats();
+      applyFilters();
+      showToast('Status updated to ' + newStatus.toUpperCase());
+      closeModal();
+    } catch (e) { showToast('Failed to update status.', 'err'); }
+  }
+
+  async function cancelOrder(id) {
+    if (!confirm('Cancel this order?')) return;
+    try {
+      await window._updateDoc(window._doc(window._db, 'orders', id), { status: 'cancelled' });
+      const idx = allOrders.findIndex(o => o.id === id);
+      if (idx !== -1) allOrders[idx].status = 'cancelled';
+      updateStats();
+      applyFilters();
+      showToast('Order cancelled.');
+    } catch (e) { showToast('Failed to cancel order.', 'err'); }
+  }
+
+  function showTab(tab, el) {
+    document.getElementById('tabOrders').style.display = tab === 'orders' ? 'block' : 'none';
+    document.getElementById('tabStats').style.display = tab === 'stats' ? 'block' : 'none';
+    document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+// ============================================================
+//  ELLECTRA AUTOMATION — FIRESTORE SECURITY RULES
+//  Paste this into Firebase Console > Firestore > Rules tab
+// ============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── ORDERS COLLECTION ────────────────────────────────────
+    match /orders/{orderId} {
+
+      // PUBLIC: Anyone can CREATE an order (customers placing orders)
+      allow create: if
+        request.resource.data.keys().hasAll(['name','phone','email','version','status','installationBooked','createdAt'])
+        && request.resource.data.status == 'pending'   // new orders must start as 'pending'
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.email is string
+        && request.resource.data.email.matches('.*@.*\\..*')
+        && request.resource.data.phone is string
+        && request.resource.data.version in ['V1', 'V2', 'V3'];
+
+      // AUTHENTICATED ADMIN ONLY: Read + Update orders
+      allow read, update, delete: if request.auth != null;
+
+      // No public reads (protect customer data)
+      allow read: if request.auth != null;
+    }
+
+    // ─── ADMIN COLLECTION (optional, for admin metadata) ──────
+    match /admins/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ─── DENY ALL ELSE ────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// ============================================================
+//  SETUP INSTRUCTIONS
+// ============================================================
+//
+//  1. Go to Firebase Console → Your Project → Firestore Database → Rules
+//  2. Replace all existing rules with the content above
+//  3. Click "Publish"
+//
+//  AUTHENTICATION SETUP:
+//  ─────────────────────
+//  A) Google Sign-In (for admins using Google):
+//     → Firebase Console → Authentication → Sign-in method → Google → Enable
+//
+//  B) Email/Password Sign-In (for admin email login):
+//     → Firebase Console → Authentication → Sign-in method → Email/Password → Enable
+//     → To create admin account:
+//       Firebase Console → Authentication → Users → Add User
+//       Enter admin email (e.g. admin@ellectra.com) and a strong password
+//
+//  C) To restrict admin panel to specific emails only, add this
+//     check in admin.html's onAuthStateChanged:
+//
+//     const ALLOWED_ADMINS = ['admin@ellectra.com', 'you@gmail.com'];
+//     if (!ALLOWED_ADMINS.includes(user.email)) {
+//       await fbSignOut(auth);
+//       alert('Access denied.');
+//       return;
+//     }
+//
+//  FIRESTORE INDEXES:
+//  ──────────────────
+//  For the admin panel's ordered query to work, create a composite index:
+//  → Firebase Console → Firestore → Indexes → Add Index
+//    Collection: orders
+//    Fields: createdAt (Descending)
+//    (Firebase will also prompt you automatically when you first run the query)
+//
+// ============================================================

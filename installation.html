@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book Installation — Ellectra Automation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black: #0a0a0a; --yellow: #FFD600; --yellow-dim: #e6c000;
+      --white: #ffffff; --light: #f5f5f0; --gray: #888;
+      --border: #e0e0e0; --green: #4caf50; --red: #f44336;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: var(--light); color: var(--black); overflow-x: hidden; }
+
+    nav {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      background: rgba(10,10,10,0.95); backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 70px; border-bottom: 2px solid var(--yellow);
+    }
+    .nav-logo img { height: 44px; object-fit: contain; }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { color: var(--white); text-decoration: none; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--yellow); }
+    .nav-cta { background: var(--yellow); color: var(--black); padding: 10px 24px; border-radius: 2px; font-weight: 900; font-size: 13px; letter-spacing: 1.5px; text-decoration: none; text-transform: uppercase; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { display: block; width: 26px; height: 2px; background: var(--yellow); }
+    .mobile-menu { display: none; position: fixed; top: 70px; left: 0; width: 100%; background: rgba(10,10,10,0.98); z-index: 999; flex-direction: column; padding: 20px 40px; gap: 20px; border-bottom: 2px solid var(--yellow); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: var(--white); text-decoration: none; font-size: 16px; font-weight: 700; text-transform: uppercase; padding: 12px 0; border-bottom: 1px solid #222; }
+
+    /* HERO */
+    .page-hero {
+      margin-top: 70px; height: 300px; position: relative;
+      display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--black);
+    }
+    .page-hero video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; }
+    .page-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10,10,10,0.4), rgba(10,10,10,0.85)); }
+    .page-hero-content { position: relative; z-index: 2; text-align: center; padding: 0 20px; }
+    .page-badge { display: inline-block; background: var(--yellow); color: var(--black); font-size: 11px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; padding: 6px 18px; border-radius: 2px; margin-bottom: 16px; }
+    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 8vw, 90px); color: var(--white); line-height: 0.9; letter-spacing: 3px; }
+    .page-title span { color: var(--yellow); }
+
+    /* MAIN */
+    .main { max-width: 1100px; margin: 0 auto; padding: 80px 40px; display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: start; }
+
+    /* VERSION SELECTOR */
+    .version-select-row { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+    .v-card {
+      flex: 1; min-width: 160px; border: 2px solid var(--border); border-radius: 4px;
+      padding: 20px 16px; cursor: pointer; transition: all 0.25s; background: var(--white);
+      text-align: center; position: relative;
+    }
+    .v-card:hover { border-color: var(--yellow); }
+    .v-card.selected { border-color: var(--yellow); background: #fff8e1; }
+    .v-card-name { font-family: 'Bebas Neue', sans-serif; font-size: 28px; margin-bottom: 6px; }
+    .v-card-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; padding: 3px 10px; border-radius: 2px; display: inline-block; }
+    .tag-opt { background: #e8f5e9; color: #2e7d32; }
+    .tag-req { background: #fff8e1; color: #e65100; }
+    .v-card-check { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; background: var(--yellow); border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+    .v-card.selected .v-card-check { display: flex; }
+
+    /* FORM */
+    .form-section { background: var(--white); border-radius: 4px; border: 1.5px solid var(--border); padding: 40px; }
+    .form-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; margin-bottom: 28px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); margin-bottom: 8px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 2px;
+      font-family: 'Montserrat', sans-serif; font-size: 14px; color: var(--black);
+      background: var(--light); outline: none; transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--yellow); background: #fff; }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .install-toggle {
+      border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden;
+      display: flex; margin-bottom: 20px;
+    }
+    .install-opt {
+      flex: 1; padding: 14px; text-align: center; cursor: pointer;
+      font-size: 13px; font-weight: 700; letter-spacing: 1px; transition: all 0.2s;
+      background: var(--light); color: var(--gray); user-select: none;
+    }
+    .install-opt.active { background: var(--yellow); color: var(--black); }
+    .install-fields { display: none; }
+    .install-fields.visible { display: block; }
+
+    .notice-box { border-radius: 4px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 12px; font-size: 13px; line-height: 1.6; }
+    .notice-opt-box { background: #e8f5e9; border-left: 4px solid #4caf50; color: #2e7d32; }
+    .notice-req-box { background: #fff8e1; border-left: 4px solid var(--yellow); color: #e65100; }
+
+    .submit-btn {
+      width: 100%; padding: 18px; background: var(--yellow); border: none; border-radius: 2px;
+      font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 15px; letter-spacing: 2px;
+      text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-top: 8px;
+    }
+    .submit-btn:hover { background: var(--yellow-dim); transform: translateY(-2px); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* SIDEBAR */
+    .sidebar {}
+    .sidebar-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 4px; padding: 32px; margin-bottom: 20px; }
+    .sidebar-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; margin-bottom: 20px; }
+    .sidebar-steps { display: flex; flex-direction: column; gap: 16px; }
+    .sidebar-step { display: flex; gap: 14px; align-items: flex-start; }
+    .step-num { width: 32px; height: 32px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; flex-shrink: 0; }
+    .step-info-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .step-info-desc { font-size: 12px; color: var(--gray); line-height: 1.5; }
+    .version-info-card { background: var(--black); color: var(--white); border-radius: 4px; padding: 24px; }
+    .version-info-name { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--yellow); margin-bottom: 8px; }
+    .version-info-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .version-info-list li { font-size: 13px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 8px; }
+    .version-info-list li::before { content: '◆'; color: var(--yellow); font-size: 7px; }
+
+    /* TOAST */
+    #toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: var(--black); color: var(--white); padding: 16px 32px; border-radius: 4px;
+      border-left: 4px solid var(--yellow); font-weight: 700; font-size: 14px;
+      opacity: 0; transition: opacity 0.3s; z-index: 9999; min-width: 300px; text-align: center;
+    }
+    #toast.show { opacity: 1; }
+    #toast.success { border-color: var(--green); }
+    #toast.error { border-color: var(--red); }
+
+    /* SUCCESS OVERLAY */
+    #successOverlay {
+      display: none; position: fixed; inset: 0; background: rgba(10,10,10,0.9);
+      z-index: 9998; align-items: center; justify-content: center;
+    }
+    #successOverlay.show { display: flex; }
+    .success-card { background: var(--white); border-radius: 8px; padding: 60px 40px; text-align: center; max-width: 480px; width: 90%; }
+    .success-icon { font-size: 64px; margin-bottom: 24px; }
+    .success-title { font-family: 'Bebas Neue', sans-serif; font-size: 40px; margin-bottom: 12px; }
+    .success-msg { font-size: 15px; color: var(--gray); line-height: 1.7; margin-bottom: 32px; }
+    .success-ref { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--yellow); background: var(--black); padding: 8px 16px; border-radius: 2px; display: inline-block; margin-bottom: 24px; }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .main { grid-template-columns: 1fr; padding: 40px 20px; gap: 30px; }
+      .form-row { grid-template-columns: 1fr; }
+      .form-section { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <img src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/Ellectra_w01wap%20(2)%20(1).png" alt="Ellectra" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"/>
+    <span style="display:none;font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--yellow);letter-spacing:3px;">ELLECTRA</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="installation.html" style="color:var(--yellow)">Book Installation</a></li>
+  </ul>
+  <a href="products.html" class="nav-cta">View Products</a>
+  <div class="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="toggleMenu()">Home</a>
+  <a href="products.html" onclick="toggleMenu()">Products</a>
+  <a href="installation.html" onclick="toggleMenu()">Book Installation</a>
+</div>
+
+<div class="page-hero">
+  <video autoplay muted loop playsinline>
+    <source src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/12680994_1920_1080_25fps.mp4" type="video/mp4"/>
+  </video>
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-content">
+    <div class="page-badge">📦 Order &amp; Install</div>
+    <h1 class="page-title">BOOK YOUR <span>ORDER</span></h1>
+  </div>
+</div>
+
+<div class="main">
+  <!-- LEFT: FORM -->
+  <div>
+    <!-- VERSION SELECT -->
+    <h3 style="font-family:'Bebas Neue',sans-serif;font-size:24px;margin-bottom:16px;letter-spacing:1px;">1. SELECT VERSION</h3>
+    <div class="version-select-row">
+      <div class="v-card" id="vc-V1" onclick="selectVersion('V1')">
+        <div class="v-card-check">✔</div>
+        <div class="v-card-name">V1</div>
+        <div class="v-card-tag tag-opt">Install Optional</div>
+      </div>
+      <div class="v-card" id="vc-V2" onclick="selectVersion('V2')">
+        <div class="v-card-check">✔</div>
+        <div class="v-card-name">V2</div>
+        <div class="v-card-tag tag-req">Install Required</div>
+      </div>
+      <div class="v-card" id="vc-V3" onclick="selectVersion('V3')">
+        <div class="v-card-check">✔</div>
+        <div class="v-card-name">V3</div>
+        <div class="v-card-tag tag-req">Install Required</div>
+      </div>
+    </div>
+
+    <!-- NOTICE -->
+    <div id="noticeBox" style="display:none;margin-bottom:24px;"></div>
+
+    <!-- FORM -->
+    <div class="form-section">
+      <div class="form-title">2. YOUR DETAILS</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="fName" placeholder="e.g. Rajesh Kumar" required/>
+        </div>
+        <div class="form-group">
+          <label>Phone Number *</label>
+          <input type="tel" id="fPhone" placeholder="+91 98765 43210" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address *</label>
+        <input type="email" id="fEmail" placeholder="your@email.com" required/>
+      </div>
+
+      <!-- V1 INSTALL TOGGLE -->
+      <div id="installToggleWrap" style="display:none;">
+        <label style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:8px;">Installation Preference</label>
+        <div class="install-toggle">
+          <div class="install-opt active" id="iopt-self" onclick="setInstallPref('self')">🔧 Self-Install (Free)</div>
+          <div class="install-opt" id="iopt-pro" onclick="setInstallPref('pro')">👷 Book Professional Install</div>
+        </div>
+      </div>
+
+      <!-- ADDRESS FIELDS (shown when install required) -->
+      <div class="install-fields" id="addressFields">
+        <div class="form-title" style="font-size:22px;margin-bottom:20px;margin-top:8px;">3. INSTALLATION ADDRESS</div>
+        <div class="form-group">
+          <label>Street Address *</label>
+          <input type="text" id="fAddress" placeholder="House / Flat No., Street Name"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City *</label>
+            <input type="text" id="fCity" placeholder="City"/>
+          </div>
+          <div class="form-group">
+            <label>State *</label>
+            <input type="text" id="fState" placeholder="State"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Pincode *</label>
+            <input type="text" id="fPincode" placeholder="600001"/>
+          </div>
+          <div class="form-group">
+            <label>Preferred Date</label>
+            <input type="date" id="fDate"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Preferred Time Slot</label>
+          <select id="fTime">
+            <option value="">-- Select Slot --</option>
+            <option>Morning (9AM–12PM)</option>
+            <option>Afternoon (12PM–3PM)</option>
+            <option>Evening (3PM–6PM)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:8px;">
+        <label>Special Requirements / Notes (Optional)</label>
+        <textarea id="fNotes" placeholder="Any specific needs, access instructions, or questions for our team..."></textarea>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitOrder()">⚡ CONFIRM ORDER</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-card" id="versionInfoCard" style="display:none;">
+      <div class="version-info-card">
+        <div id="siVersionName" class="version-info-name">—</div>
+        <ul class="version-info-list" id="siFeatures"></ul>
+      </div>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-title">HOW IT WORKS</div>
+      <div class="sidebar-steps">
+        <div class="sidebar-step">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-info-title">Select Version</div>
+            <div class="step-info-desc">Choose V1, V2, or V3 based on your needs.</div>
+          </div>
+        </div>
+        <div class="sidebar-step">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-info-title">Fill Details</div>
+            <div class="step-info-desc">Provide your contact info and address (if booking install).</div>
+          </div>
+        </div>
+        <div class="sidebar-step">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-info-title">Confirm Order</div>
+            <div class="step-info-desc">Our team reviews your booking and contacts you within 24 hrs.</div>
+          </div>
+        </div>
+        <div class="sidebar-step">
+          <div class="step-num">4</div>
+          <div>
+            <div class="step-info-title">Installation &amp; Setup</div>
+            <div class="step-info-desc">Technician visits (if booked) and gets everything running.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-card" style="background:var(--black);color:var(--white);border-color:#333;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--yellow);margin-bottom:12px;">NEED HELP?</div>
+      <p style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.7;margin-bottom:16px;">Not sure which version to pick? Our team is happy to guide you.</p>
+      <a href="products.html" style="display:block;text-align:center;background:var(--yellow);color:var(--black);padding:12px;border-radius:2px;font-weight:900;font-size:13px;letter-spacing:1.5px;text-decoration:none;text-transform:uppercase;">Compare Products</a>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div id="successOverlay">
+  <div class="success-card">
+    <div class="success-icon">⚡</div>
+    <div class="success-title">ORDER CONFIRMED!</div>
+    <p class="success-msg">Your Ellectra order has been received. Our team will contact you within 24 hours to confirm details and schedule your installation.</p>
+    <div class="success-ref" id="orderRef">ORDER #ELLEC-XXXX</div>
+    <button onclick="closeSuccess()" style="background:var(--black);color:var(--white);border:none;padding:14px 36px;border-radius:2px;font-weight:900;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;">BACK TO HOME</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAWl0Oefp8qxFw5Sveekg4lePJUO1cUYl8",
+    authDomain: "ellectra-automation.firebaseapp.com",
+    projectId: "ellectra-automation",
+    storageBucket: "ellectra-automation.firebasestorage.app",
+    messagingSenderId: "1056646799251",
+    appId: "1:1056646799251:web:a12c8a5e8855d19a1b1266"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  window._db = db;
+  window._auth = auth;
+  window._collection = collection;
+  window._addDoc = addDoc;
+  window._serverTimestamp = serverTimestamp;
+
+  // Optional: track auth state for sign-in UI
+  onAuthStateChanged(auth, (user) => {
+    window._currentUser = user || null;
+  });
+</script>
+
+<script>
+  let selectedVersion = null;
+  let installPref = 'self'; // 'self' or 'pro'
+
+  const versionData = {
+    V1: {
+      features: ['2-Channel Relay', 'Real-Time Feedback', 'App Controlled', 'DIY Friendly', 'Custom PCB Layout'],
+      requireInstall: false
+    },
+    V2: {
+      features: ['Enhanced Relay + Feedback', 'Advanced Sensors', 'Energy Monitoring', 'App Controlled', 'Pro Install Required'],
+      requireInstall: true
+    },
+    V3: {
+      features: ['Power Factor Sensing', 'Full Feedback System', 'Energy Analytics', 'App Controlled', 'Pro Install Required'],
+      requireInstall: true
+    }
+  };
+
+  function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('open'); }
+
+  function selectVersion(v) {
+    selectedVersion = v;
+    ['V1','V2','V3'].forEach(x => document.getElementById('vc-'+x).classList.remove('selected'));
+    document.getElementById('vc-'+v).classList.add('selected');
+
+    const info = versionData[v];
+
+    // Version sidebar card
+    document.getElementById('siVersionName').textContent = 'ELLECTRA ' + v;
+    const fList = document.getElementById('siFeatures');
+    fList.innerHTML = info.features.map(f => `<li>${f}</li>`).join('');
+    document.getElementById('versionInfoCard').style.display = 'block';
+
+    // Notice
+    const nb = document.getElementById('noticeBox');
+    if (info.requireInstall) {
+      nb.style.display = 'flex';
+      nb.className = 'notice-box notice-req-box';
+      nb.innerHTML = '<span style="font-size:20px">⚠️</span><div><b>Installation Required for ' + v + '</b><br/>Professional installation is mandatory. Please fill in your address details below.</div>';
+      document.getElementById('installToggleWrap').style.display = 'none';
+      document.getElementById('addressFields').classList.add('visible');
+      makeAddressRequired(true);
+    } else {
+      nb.style.display = 'flex';
+      nb.className = 'notice-box notice-opt-box';
+      nb.innerHTML = '<span style="font-size:20px">🔧</span><div><b>V1 — Self-Installation Available</b><br/>You can install V1 yourself. Optionally book a professional technician below.</div>';
+      document.getElementById('installToggleWrap').style.display = 'block';
+      setInstallPref('self');
+    }
+  }
+
+  function setInstallPref(pref) {
+    installPref = pref;
+    document.getElementById('iopt-self').classList.toggle('active', pref === 'self');
+    document.getElementById('iopt-pro').classList.toggle('active', pref === 'pro');
+    if (pref === 'pro') {
+      document.getElementById('addressFields').classList.add('visible');
+      makeAddressRequired(true);
+    } else {
+      document.getElementById('addressFields').classList.remove('visible');
+      makeAddressRequired(false);
+    }
+  }
+
+  function makeAddressRequired(yes) {
+    ['fAddress','fCity','fState','fPincode'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.required = yes;
+    });
+  }
+
+  function showToast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    setTimeout(() => { t.className = ''; }, 3500);
+  }
+
+  function closeSuccess() {
+    document.getElementById('successOverlay').classList.remove('show');
+    window.location.href = 'index.html';
+  }
+
+  async function submitOrder() {
+    if (!selectedVersion) { showToast('⚡ Please select a product version first!', 'error'); return; }
+
+    const name = document.getElementById('fName').value.trim();
+    const phone = document.getElementById('fPhone').value.trim();
+    const email = document.getElementById('fEmail').value.trim();
+    const notes = document.getElementById('fNotes').value.trim();
+
+    if (!name || !phone || !email) { showToast('Please fill in all required fields.', 'error'); return; }
+
+    const needInstall = versionData[selectedVersion].requireInstall || installPref === 'pro';
+    let address = {};
+    if (needInstall) {
+      const addr = document.getElementById('fAddress').value.trim();
+      const city = document.getElementById('fCity').value.trim();
+      const state = document.getElementById('fState').value.trim();
+      const pin = document.getElementById('fPincode').value.trim();
+      if (!addr || !city || !state || !pin) { showToast('Please fill in complete address details.', 'error'); return; }
+      address = {
+        street: addr, city, state, pincode: pin,
+        preferredDate: document.getElementById('fDate').value,
+        preferredTime: document.getElementById('fTime').value
+      };
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    const orderData = {
+      version: selectedVersion,
+      name, phone, email,
+      installationType: needInstall ? (versionData[selectedVersion].requireInstall ? 'professional_required' : 'professional_optional') : 'self_install',
+      installationBooked: needInstall,
+      address: needInstall ? address : null,
+      notes: notes || null,
+      status: 'pending',
+      createdAt: window._serverTimestamp ? window._serverTimestamp() : new Date().toISOString()
+    };
+
+    try {
+      if (window._db && window._addDoc && window._collection) {
+        const docRef = await window._addDoc(window._collection(window._db, 'orders'), orderData);
+        const refCode = 'ELLEC-' + docRef.id.substring(0, 6).toUpperCase();
+        document.getElementById('orderRef').textContent = 'ORDER #' + refCode;
+        document.getElementById('successOverlay').classList.add('show');
+      } else {
+        throw new Error('Firebase not loaded');
+      }
+    } catch (err) {
+      console.error('Order error:', err);
+      showToast('Error submitting order. Please try again.', 'error');
+      btn.disabled = false;
+      btn.textContent = '⚡ CONFIRM ORDER';
+    }
+  }
+
+  // Auto-select from URL params
+  window.addEventListener('load', () => {
+    const params = new URLSearchParams(window.location.search);
+    const v = params.get('version');
+    if (v && ['V1','V2','V3'].includes(v)) selectVersion(v);
+    const install = params.get('install');
+    if (install === 'yes' && v === 'V1') setTimeout(() => setInstallPref('pro'), 100);
+  });
+</script>
+</body>
+</html>

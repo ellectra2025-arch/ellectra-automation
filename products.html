@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products — Ellectra Automation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black: #0a0a0a; --yellow: #FFD600; --yellow-dim: #e6c000;
+      --white: #ffffff; --light: #f5f5f0; --gray: #888;
+      --border: #e0e0e0; --card-bg: #ffffff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: var(--light); color: var(--black); overflow-x: hidden; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      background: rgba(10,10,10,0.95); backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 70px; border-bottom: 2px solid var(--yellow);
+    }
+    .nav-logo img { height: 44px; object-fit: contain; }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { color: var(--white); text-decoration: none; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--yellow); }
+    .nav-cta { background: var(--yellow); color: var(--black); padding: 10px 24px; border-radius: 2px; font-weight: 900; font-size: 13px; letter-spacing: 1.5px; text-decoration: none; text-transform: uppercase; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { display: block; width: 26px; height: 2px; background: var(--yellow); }
+    .mobile-menu {
+      display: none; position: fixed; top: 70px; left: 0; width: 100%;
+      background: rgba(10,10,10,0.98); z-index: 999; flex-direction: column;
+      padding: 20px 40px; gap: 20px; border-bottom: 2px solid var(--yellow);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: var(--white); text-decoration: none; font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 12px 0; border-bottom: 1px solid #222; }
+
+    /* PAGE HERO */
+    .page-hero {
+      margin-top: 70px; height: 360px; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; background: var(--black);
+    }
+    .page-hero video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; }
+    .page-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10,10,10,0.5), rgba(10,10,10,0.8)); }
+    .page-hero-content { position: relative; z-index: 2; text-align: center; padding: 0 20px; }
+    .page-badge { display: inline-block; background: var(--yellow); color: var(--black); font-size: 11px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; padding: 6px 18px; border-radius: 2px; margin-bottom: 16px; }
+    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 8vw, 100px); color: var(--white); line-height: 0.9; letter-spacing: 3px; }
+    .page-title span { color: var(--yellow); }
+
+    /* VERSION TABS */
+    .version-tabs {
+      background: var(--white); border-bottom: 2px solid var(--border);
+      position: sticky; top: 70px; z-index: 900;
+      display: flex; justify-content: center; gap: 0;
+    }
+    .tab-btn {
+      padding: 20px 48px; font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+      letter-spacing: 2px; border: none; background: transparent; cursor: pointer;
+      color: var(--gray); border-bottom: 3px solid transparent; transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--black); }
+    .tab-btn.active { color: var(--black); border-bottom-color: var(--yellow); }
+
+    /* PRODUCT SECTION */
+    .product-section { padding: 80px 40px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .product-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .product-gallery { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+    .product-main-img { width: 100%; max-width: 100%; height: 320px; object-fit: cover; object-position: center; border-radius: 4px; border: 2px solid var(--border); background: #111; display: block; }
+    .product-thumb-row { display: flex; gap: 12px; }
+    .product-thumb {
+      flex: 1; min-width: 0; aspect-ratio: 1; object-fit: cover; object-position: center; border-radius: 4px;
+      border: 2px solid var(--border); cursor: pointer; transition: border-color 0.2s; background: #111; display: block;
+    }
+    .product-thumb:hover, .product-thumb.active { border-color: var(--yellow); }
+    .product-video-wrap { position: relative; border-radius: 4px; overflow: hidden; border: 2px solid var(--yellow); width: 100%; }
+    .product-video-wrap video { width: 100%; height: 220px; object-fit: cover; display: block; }
+    .video-label { position: absolute; top: 12px; left: 12px; background: var(--yellow); color: var(--black); font-size: 10px; font-weight: 900; letter-spacing: 2px; padding: 4px 10px; border-radius: 2px; }
+
+    .product-info {}
+    .version-tag { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .vtag { background: var(--black); color: var(--yellow); font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; padding: 6px 16px; border-radius: 2px; }
+    .install-tag { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 14px; border-radius: 2px; }
+    .opt { background: #e8f5e9; color: #2e7d32; }
+    .req { background: #fff8e1; color: #e65100; }
+    .product-name-lg { font-family: 'Bebas Neue', sans-serif; font-size: clamp(40px, 5vw, 64px); line-height: 1; margin-bottom: 16px; }
+    .product-desc { font-size: 15px; color: #444; line-height: 1.8; margin-bottom: 32px; }
+
+    .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-bottom: 32px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .spec-item { background: var(--white); padding: 16px 20px; }
+    .spec-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--gray); margin-bottom: 6px; }
+    .spec-val { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--black); }
+
+    .install-notice {
+      border-radius: 4px; padding: 20px 24px; margin-bottom: 28px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .notice-opt { background: #e8f5e9; border-left: 4px solid #4caf50; }
+    .notice-req { background: #fff8e1; border-left: 4px solid var(--yellow); }
+    .notice-icon { font-size: 22px; flex-shrink: 0; }
+    .notice-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .notice-text { font-size: 13px; color: #555; line-height: 1.6; }
+
+    .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary { background: var(--yellow); color: var(--black); padding: 16px 36px; font-weight: 900; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; border-radius: 2px; transition: all 0.2s; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; }
+    .btn-primary:hover { background: var(--yellow-dim); transform: translateY(-2px); }
+    .btn-outline { border: 2px solid var(--black); color: var(--black); padding: 14px 34px; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; border-radius: 2px; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--black); color: var(--white); }
+
+    /* COMPARE TABLE */
+    .compare-section { background: var(--black); padding: 80px 40px; color: var(--white); }
+    .section-label { font-size: 11px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--yellow); margin-bottom: 14px; }
+    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 5vw, 64px); line-height: 1; margin-bottom: 48px; color: var(--white); }
+    .compare-table { width: 100%; border-collapse: collapse; }
+    .compare-table th { padding: 16px 24px; text-align: center; font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; }
+    .compare-table th:first-child { text-align: left; font-size: 14px; letter-spacing: 2px; color: var(--gray); }
+    .compare-table td { padding: 14px 24px; text-align: center; font-size: 14px; border-bottom: 1px solid #1a1a1a; color: rgba(255,255,255,0.7); }
+    .compare-table td:first-child { text-align: left; color: rgba(255,255,255,0.5); font-size: 13px; }
+    .compare-table tr:hover td { background: #111; }
+    .check { color: var(--yellow); font-size: 18px; }
+    .cross { color: #444; }
+    .v-head { color: var(--yellow); }
+
+    /* DIVIDER */
+    .version-divider { height: 4px; background: linear-gradient(90deg, var(--yellow), transparent); margin: 0; }
+
+    footer {
+      background: var(--black); border-top: 2px solid var(--yellow);
+      padding: 40px; text-align: center;
+    }
+    footer p { color: rgba(255,255,255,0.3); font-size: 12px; }
+    footer a { color: var(--yellow); text-decoration: none; margin: 0 12px; font-size: 13px; font-weight: 700; }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .product-layout { grid-template-columns: 1fr; gap: 40px; }
+      .product-section { padding: 60px 20px; }
+      .compare-section { padding: 60px 20px; }
+      .spec-grid { grid-template-columns: 1fr; }
+      .tab-btn { padding: 16px 24px; font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <img src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/Ellectra_w01wap%20(2)%20(1).png" alt="Ellectra" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"/>
+    <span style="display:none;font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--yellow);letter-spacing:3px;">ELLECTRA</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="products.html" class="active">Products</a></li>
+    <li><a href="installation.html">Installation</a></li>
+  </ul>
+  <a href="installation.html" class="nav-cta">Book Install</a>
+  <div class="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="toggleMenu()">Home</a>
+  <a href="products.html" onclick="toggleMenu()">Products</a>
+  <a href="installation.html" onclick="toggleMenu()">Book Installation</a>
+</div>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <video autoplay muted loop playsinline>
+    <source src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/5377697-uhd_2160_3840_25fps.mp4" type="video/mp4"/>
+  </video>
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-content">
+    <div class="page-badge">⚡ Smart Products</div>
+    <h1 class="page-title">OUR <span>PRODUCTS</span></h1>
+  </div>
+</div>
+
+<!-- VERSION TABS -->
+<div class="version-tabs">
+  <button class="tab-btn active" onclick="showVersion('v1', this)">V1</button>
+  <button class="tab-btn" onclick="showVersion('v2', this)">V2</button>
+  <button class="tab-btn" onclick="showVersion('v3', this)">V3</button>
+</div>
+
+<!-- V1 -->
+<div id="sec-v1" class="product-section" style="background:var(--light)">
+  <div class="container">
+    <div class="product-layout">
+      <div class="product-gallery">
+        <img id="v1-main" class="product-main-img" src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/v1.png" alt="Ellectra V1"/>
+        <div class="product-thumb-row">
+          <img class="product-thumb active" src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/v1.png" alt="V1" onclick="swapImg('v1-main', this.src, this)"/>
+          <img class="product-thumb" src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/vi%20fix.png" alt="V1 Fixed" onclick="swapImg('v1-main', this.src, this)"/>
+          <img class="product-thumb" src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/v1pcblayout.png" alt="PCB" onclick="swapImg('v1-main', this.src, this)"/>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="version-tag">
+          <div class="vtag">V1</div>
+          <div class="install-tag opt">Install Optional</div>
+        </div>
+        <h2 class="product-name-lg">ELLECTRA V1</h2>
+        <p class="product-desc">The entry-level smart switch built for the DIY enthusiast. The V1 features two independent relay channels with real-time status feedback, letting you control and monitor two circuits from anywhere via the Ellectra app. Designed for easy self-installation — no electrician needed (though we offer installation support if you prefer).</p>
+
+        <div class="spec-grid">
+          <div class="spec-item">
+            <div class="spec-label">Relay Channels</div>
+            <div class="spec-val">2-Channel</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Feedback</div>
+            <div class="spec-val">Real-Time</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Connectivity</div>
+            <div class="spec-val">Wi-Fi</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Installation</div>
+            <div class="spec-val">DIY / Optional</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">PCB</div>
+            <div class="spec-val">Custom Layout</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">App Controlled</div>
+            <div class="spec-val">Yes</div>
+          </div>
+        </div>
+
+        <div class="install-notice notice-opt">
+          <div class="notice-icon">🔧</div>
+          <div>
+            <div class="notice-title">Self-Installation Available</div>
+            <div class="notice-text">V1 is designed for easy self-installation. You can plug it in yourself following our guide. However, if you'd prefer professional installation, we're happy to send a technician to your address.</div>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <a href="installation.html?version=V1" class="btn-primary">Order V1</a>
+          <a href="installation.html?version=V1&install=yes" class="btn-outline">+ Book Installation</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="version-divider"></div>
+
+<!-- V2 -->
+<div id="sec-v2" class="product-section" style="background:var(--white); display:none">
+  <div class="container">
+    <div class="product-layout">
+      <div class="product-gallery">
+        <img id="v2-main" class="product-main-img" src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/v2.png" alt="Ellectra V2"/>
+        <div class="product-thumb-row">
+          <img class="product-thumb active" src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/v2.png" alt="V2" onclick="swapImg('v2-main', this.src, this)"/>
+        </div>
+        <div class="product-video-wrap">
+          <video autoplay muted loop playsinline>
+            <source src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/v2%20video.mp4" type="video/mp4"/>
+          </video>
+          <div class="video-label">▶ V2 IN ACTION</div>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="version-tag">
+          <div class="vtag">V2</div>
+          <div class="install-tag req">Installation Required</div>
+        </div>
+        <h2 class="product-name-lg">ELLECTRA V2</h2>
+        <p class="product-desc">The V2 takes home automation to the next level with an enhanced feedback system and advanced sensor integration. Built for homeowners who want reliable, professional-grade smart switching with comprehensive monitoring. Professional installation is mandatory to ensure safety and optimal performance.</p>
+
+        <div class="spec-grid">
+          <div class="spec-item">
+            <div class="spec-label">Relay System</div>
+            <div class="spec-val">Enhanced</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Feedback</div>
+            <div class="spec-val">Advanced</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Connectivity</div>
+            <div class="spec-val">Wi-Fi</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Installation</div>
+            <div class="spec-val">Required</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Energy Monitor</div>
+            <div class="spec-val">Enabled</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">App Controlled</div>
+            <div class="spec-val">Yes</div>
+          </div>
+        </div>
+
+        <div class="install-notice notice-req">
+          <div class="notice-icon">⚠️</div>
+          <div>
+            <div class="notice-title">Professional Installation Required</div>
+            <div class="notice-text">V2 requires installation by a certified Ellectra technician. After ordering, you must book an installation slot. Our team will visit your address, install the device safely, and ensure everything is working perfectly before they leave.</div>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <a href="installation.html?version=V2" class="btn-primary">Order &amp; Book V2</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="version-divider"></div>
+
+<!-- V3 -->
+<div id="sec-v3" class="product-section" style="background:var(--light); display:none">
+  <div class="container">
+    <div class="product-layout">
+      <div class="product-gallery">
+        <img id="v3-main" class="product-main-img" src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/image.png" alt="Ellectra V3"/>
+        <div class="product-thumb-row">
+          <img class="product-thumb active" src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/image.png" alt="V3" onclick="swapImg('v3-main', this.src, this)"/>
+          <img class="product-thumb" src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/v3.jpeg" alt="V3 Alt" onclick="swapImg('v3-main', this.src, this)"/>
+        </div>
+        <div class="product-video-wrap">
+          <video autoplay muted loop playsinline>
+            <source src="https://raw.githubusercontent.com/ellectra2025-arch/ellectra-automation/main/v3%20video.mp4" type="video/mp4"/>
+          </video>
+          <div class="video-label">▶ V3 IN ACTION</div>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="version-tag">
+          <div class="vtag">V3</div>
+          <div class="install-tag req">Installation Required</div>
+        </div>
+        <h2 class="product-name-lg">ELLECTRA V3</h2>
+        <p class="product-desc">Our flagship product — the V3 combines everything from V1 and V2 and adds real-time Power Factor monitoring and full energy analytics. This is the ultimate smart home automation solution for those who want total control and insight into their home's electrical performance. Professional installation is mandatory.</p>
+
+        <div class="spec-grid">
+          <div class="spec-item">
+            <div class="spec-label">Power Factor</div>
+            <div class="spec-val">Measured</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Feedback</div>
+            <div class="spec-val">Full System</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Energy Analytics</div>
+            <div class="spec-val">Real-Time</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Installation</div>
+            <div class="spec-val">Required</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Connectivity</div>
+            <div class="spec-val">Wi-Fi</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">App Controlled</div>
+            <div class="spec-val">Yes</div>
+          </div>
+        </div>
+
+        <div class="install-notice notice-req">
+          <div class="notice-icon">⚠️</div>
+          <div>
+            <div class="notice-title">Professional Installation Required</div>
+            <div class="notice-text">V3 requires installation by a certified Ellectra technician due to its advanced power monitoring components. After booking, our team will visit your address and complete full setup and calibration.</div>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <a href="installation.html?version=V3" class="btn-primary">Order &amp; Book V3</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARE TABLE -->
+<div class="compare-section">
+  <div class="container">
+    <div class="section-label">Comparison</div>
+    <h2 class="section-title">COMPARE ALL<br>VERSIONS</h2>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th class="v-head">V1</th>
+          <th class="v-head">V2</th>
+          <th class="v-head">V3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Relay Control</td><td><span class="check">✔</span></td><td><span class="check">✔</span></td><td><span class="check">✔</span></td></tr>
+        <tr><td>Status Feedback</td><td><span class="check">✔</span></td><td><span class="check">✔</span></td><td><span class="check">✔</span></td></tr>
+        <tr><td>App Control</td><td><span class="check">✔</span></td><td><span class="check">✔</span></td><td><span class="check">✔</span></td></tr>
+        <tr><td>Enhanced Feedback</td><td><span class="cross">—</span></td><td><span class="check">✔</span></td><td><span class="check">✔</span></td></tr>
+        <tr><td>Energy Monitoring</td><td><span class="cross">—</span></td><td><span class="check">✔</span></td><td><span class="check">✔</span></td></tr>
+        <tr><td>Power Factor Sensing</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✔</span></td></tr>
+        <tr><td>Real-Time Analytics</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✔</span></td></tr>
+        <tr><td>Self-Installation</td><td><span class="check">✔</span></td><td><span class="cross">—</span></td><td><span class="cross">—</span></td></tr>
+        <tr><td>Pro Installation Available</td><td><span class="check">Optional</span></td><td><span class="check">Required</span></td><td><span class="check">Required</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer>
+  <a href="index.html">Home</a>
+  <a href="products.html">Products</a>
+  <a href="installation.html">Book Installation</a>
+  <p style="margin-top:24px">© 2025 Ellectra Automation — ⚡ Smart Home Solutions</p>
+</footer>
+
+<script>
+  function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('open'); }
+
+  function showVersion(v, btn) {
+    ['v1','v2','v3'].forEach(x => {
+      document.getElementById('sec-'+x).style.display = (x === v) ? 'block' : 'none';
+    });
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('sec-'+v).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function swapImg(mainId, src, thumb) {
+    document.getElementById(mainId).src = src;
+    thumb.closest('.product-gallery').querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+  }
+
+  // Auto-show version from URL hash
+  const hash = window.location.hash;
+  if (hash === '#v2') showVersion('v2', document.querySelectorAll('.tab-btn')[1]);
+  else if (hash === '#v3') showVersion('v3', document.querySelectorAll('.tab-btn')[2]);
+</script>
+</body>
+</html>
